@@ -12,7 +12,7 @@ Support the following social media platforms:
 - Facebook
 - Tumblr
 
-Do NOT actually create a functioning application. Just stub out the classes,
+Don't actually create a functioning application. Just stub out the classes,
 methods, and functions. Do include parameters and sample return values. Also
 include pseudo-code test cases.
 """
