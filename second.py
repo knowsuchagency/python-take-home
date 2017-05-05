@@ -12,7 +12,7 @@ def flip_dict(source_dict):
      Example:
          given {'a': [1, 2]} should return {1: 'a', 2: 'a'}
     """
-    flipped = {}
+    flipped = {v:k for k in source_dict for v in source_dict[k]}
 
     return flipped
 
