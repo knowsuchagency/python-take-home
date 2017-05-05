@@ -21,6 +21,7 @@ from functools import singledispatch
 from enum import Enum, auto
 import logging
 import typing
+import pytest
 
 
 # define concrete types for the content we want to post
@@ -31,11 +32,13 @@ class Image(str):
     """
     pass
 
+
 class Link(str):
     """
     This type of string refers to an external url.
     """
     pass
+
 
 class Text(str):
     """
@@ -43,10 +46,12 @@ class Text(str):
     """
     pass
 
+
 # Create union of content types so we can use a static type checker
 # if we want and to help document code
 
 Content = typing.Union[Image, Link, Text]
+
 
 # enumerate the social media platforms we want to support
 class SocialNetwork(Enum):
@@ -54,10 +59,11 @@ class SocialNetwork(Enum):
     facebook = auto()
     tumblr = auto()
 
+
 # define functions for posting to twitter
 
 @singledispatch
-def post_to_twitter(content):
+def post_to_twitter(content) -> None:
     """
     Post content to twitter.
     
@@ -67,22 +73,28 @@ def post_to_twitter(content):
     logging.error(f'No function registered to handle posting type: {type(content)} to twitter')
     pass
 
+
+# These would return True if successful, return False by default
+
 @post_to_twitter.register(Image)
-def _(content):
-    pass
+def _(content) -> bool:
+    return False
+
 
 @post_to_twitter.register(Link)
-def _(content):
-    pass
+def _(content) -> bool:
+    return False
+
 
 @post_to_twitter.register(Text)
-def _(content):
-    pass
+def _(content) -> bool:
+    return False
+
 
 # define functions for posting to tumblr
 
 @singledispatch
-def post_to_tumblr(content):
+def post_to_tumblr(content) -> None:
     """
     Post content to tumblr.
     
@@ -92,21 +104,25 @@ def post_to_tumblr(content):
     logging.error(f'No function registered to handle posting type: {type(content)} to tumblr')
     pass
 
+
 @post_to_tumblr.register(Image)
-def _(content):
-    pass
+def _(content) -> bool:
+    return False
+
 
 @post_to_tumblr.register(Link)
-def _(content):
-    pass
+def _(content) -> bool:
+    return False
+
 
 @post_to_tumblr.register(Text)
-def _(content):
-    pass
+def _(content) -> bool:
+    return False
+
 
 # define functions for posting to facebook
 @singledispatch
-def post_to_facebook(content):
+def post_to_facebook(content) -> None:
     """
     Post content to facebook.
 
@@ -116,22 +132,25 @@ def post_to_facebook(content):
     logging.error(f'No function registered to handle posting type: {type(content)} to facebook')
     pass
 
+
 @post_to_facebook.register(Image)
-def _(content):
-    pass
+def _(content) -> bool:
+    return False
+
 
 @post_to_facebook.register(Link)
-def _(content):
-    pass
+def _(content) -> bool:
+    return False
+
 
 @post_to_facebook.register(Text)
-def _(content):
-    pass
+def _(content) -> bool:
+    return False
+
 
 # generic post function
 
 def post(content: Content, social_network: SocialNetwork):
-
     # the actual function we want to use based on the social network
     function = {
         SocialNetwork.twitter: post_to_twitter,
@@ -145,3 +164,17 @@ def post(content: Content, social_network: SocialNetwork):
         raise ValueError(message)
 
     return function(content)
+
+
+def test_post_returns_correct_values_for_arguments():
+    with pytest.raises(ValueError):
+        post('hello', 'there')
+        post(Image('foo'), 'bar')
+
+    assert post(Text('dab'), SocialNetwork.twitter) == False
+
+
+def test_post_to_twitter_returns_none_for_non_content():
+    assert post_to_twitter('hello') is None
+    assert post_to_twitter(1) is None
+    assert post_to_twitter(['hi', 'there']) is None
